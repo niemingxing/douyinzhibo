@@ -1,0 +1,56 @@
+{
+	"manifest_version": 3,
+	"name": "抖音直播公屏消息助手",
+	"version": "1.0",
+	"description": "抖音直播公屏自动发送消息，解放双手。",
+	"author": "niemingxing",
+	"icons":
+	{
+		"16":"icon16.png",
+		"48":"icon48.png",
+		"128":"icon128.png"
+	},
+	"action":
+	{
+		"default_icon": "icon16.png",
+		"default_popup": "popup.html"
+	},
+	"options_page": "options.html",
+	"background":
+	{
+		"service_worker": "js/background.js"
+	},
+	"host_permissions": [
+		"https://douyin.com/*",
+		"https://www.douyin.com/*",
+		"https://live.douyin.com/*",
+		"https://api.kaipm.com/*"
+	],
+	"content_scripts": 
+	[
+		{
+			"matches": ["https://www.douyin.com/*","https://live.douyin.com/*"],
+			"js": ["js/content-script.js"],
+			"css": [
+				"css/page_layer.css"
+			]
+		}
+	],
+	"web_accessible_resources":
+	[
+		{
+			"resources" : ["css/page_layer.css"],
+			"matches": [
+				"*://www.douyin.com/*",
+				"*://douyin.com/*",
+				"*://live.douyin.com/*"
+			]
+		}
+	],
+	"permissions": [
+		"storage",
+		"activeTab",
+		"tabs",
+		"scripting"
+	]
+}
