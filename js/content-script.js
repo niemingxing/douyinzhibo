@@ -111,8 +111,8 @@ function startAutoReply()
 {
 	let chatTextArea = document.querySelector("textarea.webcast-chatroom___textarea");
 	let sendButton = document.querySelector("button.webcast-chatroom___send-btn");
-	const minDelay = 2000; // 最小等待时间，单位毫秒
-	const maxDelay = 5000; // 最大等待时间，单位毫秒
+	const minDelay = 1000; // 最小等待时间，单位毫秒
+	const maxDelay = 3000; // 最大等待时间，单位毫秒
 
 	let intervalId = setInterval(() => {
 		if(!isAutoReply) clearInterval(intervalId);
@@ -123,7 +123,7 @@ function startAutoReply()
 				sendButton.click();
 			},500);
 		}, delay);
-	}, 10000); // 这里设置 setInterval 的时间间隔为最大等待时间
+	}, 5000); // 这里设置 setInterval 的时间间隔为最大等待时间
 }
 
 function getRandomDelay(min, max) {
