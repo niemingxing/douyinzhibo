@@ -155,7 +155,7 @@ function startAutoMakeData()
 	makeDataExec();
 }
 
-function makeDataExec()
+async function makeDataExec()
 {
 	if(hasMakeDataNums >= dataNums)
 	{
@@ -200,9 +200,8 @@ function makeDataExec()
 			console.log(displayValue);
 			if(displayValue == "block")
 			{
-				setTimeout(function (){
-					followObj.firstElementChild.click();
-				},1000);
+				let doRes = await doFollow(followObj);
+				console.log("doFollow:" + doRes);
 			}
 		}
 
@@ -213,9 +212,8 @@ function makeDataExec()
 			let fwState = likeObj.getAttribute('data-e2e-state');
 			if(fwState == "video-player-no-digged")
 			{
-				setTimeout(function (){
-					likeObj.click();
-				},4000);
+				let doRes = await doLike(likeObj);
+				console.log("doLike:" + doRes);
 			}
 
 			//收藏
@@ -225,40 +223,23 @@ function makeDataExec()
 				let clState = collectObj.getAttribute('data-e2e-state');
 				if(clState == "video-player-no-collect")
 				{
-					setTimeout(function (){
-						collectObj.click();
-					},7000);
+					let doRes = await doCollect(collectObj);
+					console.log("doCollect:" + doRes);
 				}
 			}
 
 			//评论
 			let commentObj = activeVideo.querySelector("div[data-e2e=feed-comment-icon]");
 			if(commentObj) {
-				setTimeout(function (){
-					commentObj.click();
-					setTimeout(function (){
-						let commentInput = document.querySelector("div.comment-input-inner-container div.DraftEditor-editorContainer").firstElementChild;
-						console.log(commentInput);
-						copyToClipboard(getRandomContentFromText(autoCommentText));
-						// 设置编辑器焦点
-						commentInput.focus();
-						document.execCommand("paste");
-						setTimeout(function (){
-							let optBtnObjs = document.querySelector("div.commentInput-right-ct").firstElementChild;
-							let commentSubmitObj = optBtnObjs.children[2];
-							if(commentSubmitObj)
-							{
-								commentSubmitObj.click();
-								setTimeout(function (){
-									commentObj.click();
-									hasMakeDataNums ++;
-									doNextVideoData();
-								},2000);
-							}
-						},2000);
-						console.log("点击留言框");
-					},3000);
-				},10000);
+				let doRes = '';
+				doRes = await doComment(commentObj);
+				console.log("doComment:" + doRes);
+				doRes = await inputCommentContent();
+				console.log("inputCommentContent:" + doRes);
+				doRes = await submitCommentContent();
+				console.log("submitCommentContent:" + doRes);
+				doRes = await submitCommentContentComplete(commentObj);
+				console.log("submitCommentContentComplete:" + doRes);
 			}
 		}
 		else
@@ -276,20 +257,81 @@ function doFollow(target) {
 	return new Promise(function(resolve, reject) {
 		setTimeout(function (){
 			target.firstElementChild.click();
+			resolve("success");
 		},1000);
 	})
 }
 
-function testAsync2() {
+function doLike(target)
+{
 	return new Promise(function(resolve, reject) {
-		setTimeout(function() {
-			if (true) {
-				console.log('请求中2...')
-				resolve('resolve return2')
-			} else {
-				reject('reject return2')
+		setTimeout(function (){
+			target.click();
+			resolve("success");
+		},2000);
+	})
+}
+
+function doCollect(target)
+{
+	return new Promise(function(resolve, reject) {
+		setTimeout(function (){
+			target.click();
+			resolve("success");
+		},2000);
+	})
+}
+
+function doComment(target)
+{
+	return new Promise(function(resolve, reject) {
+		setTimeout(function (){
+			target.click();
+			resolve("success");
+		},2000);
+	})
+}
+
+function inputCommentContent()
+{
+	return new Promise(function(resolve, reject) {
+		setTimeout(function (){
+			let commentInput = document.querySelector("div.comment-input-inner-container div.DraftEditor-editorContainer").firstElementChild;
+			console.log(commentInput);
+			copyToClipboard(getRandomContentFromText(autoCommentText));
+			// 设置编辑器焦点
+			commentInput.focus();
+			document.execCommand("paste");
+			console.log("点击留言框");
+			resolve("success");
+		},3000);
+	})
+}
+
+function submitCommentContent()
+{
+	return new Promise(function(resolve, reject) {
+		setTimeout(function (){
+			let optBtnObjs = document.querySelector("div.commentInput-right-ct").firstElementChild;
+			let commentSubmitObj = optBtnObjs.children[2];
+			if(commentSubmitObj)
+			{
+				commentSubmitObj.click();
 			}
-		}, 2000)
+			resolve("success");
+		},2000);
+	})
+}
+
+function submitCommentContentComplete(target)
+{
+	return new Promise(function(resolve, reject) {
+		setTimeout(function (){
+			target.click();
+			hasMakeDataNums ++;
+			doNextVideoData();
+			resolve("success");
+		},2000);
 	})
 }
 
