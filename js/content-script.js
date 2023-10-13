@@ -1,11 +1,12 @@
 ﻿let currentDomain = window.location.hostname;
 let autoReplyText = '';
 let autoCommentText = '';
-let isAutoReply = false;
+let isAutoOperate = false;
 let makeDataType = '';
 let dataNums = 0;
 let userKeyword = '';
 let hasMakeDataNums = 0;
+let actionMap = {};
 /**
  * 初始化弹层
  */
@@ -32,7 +33,7 @@ function initToolButton() {
 		if(this.innerText.includes("开启自动操作"))
 		{
 			this.disabled = true;
-			isAutoReply = true;
+			isAutoOperate = true;
 			this.style.backgroundColor = 'red';
 			this.innerText = this.innerText.replace("开启自动操作","关闭自动操作");
 			chrome.runtime.sendMessage({"type":"check_mkey"}, function (response) {
@@ -42,7 +43,7 @@ function initToolButton() {
 		else if(this.innerText.includes("关闭自动操作"))
 		{
 			this.disabled = false;
-			isAutoReply = false;
+			isAutoOperate = false;
 			this.style.backgroundColor = '#00bebd';
 			this.innerText = this.innerText.replace("关闭自动操作","开启自动操作");
 		}
@@ -52,6 +53,21 @@ function initToolButton() {
 function activiteToolButton()
 {
 	document.querySelector("#dylive-sr-toggleButton").disabled = false;
+}
+
+function updateHandleNums()
+{
+	let buttonElement = document.querySelector("#dylive-sr-toggleButton")
+	let buttonText = buttonElement.textContent;
+	if(buttonText.includes("("))
+	{
+		buttonElement.textContent = buttonText.replace(/\([^)]*\)/g, "(" + hasMakeDataNums + ")");
+	}
+	else
+	{
+		buttonElement.textContent = buttonText + "(" + hasMakeDataNums + ")";
+	}
+
 }
 
 /**
@@ -136,7 +152,7 @@ function startAutoReply()
 	const maxDelay = 3000; // 最大等待时间，单位毫秒
 
 	let intervalId = setInterval(() => {
-		if(!isAutoReply) clearInterval(intervalId);
+		if(!isAutoOperate) clearInterval(intervalId);
 		const delay = getRandomDelay(minDelay, maxDelay);
 		setTimeout(() => {
 			inputDispatchEventEvent(chatTextArea,getRandomContentFromText(autoReplyText));
@@ -153,6 +169,13 @@ function startAutoReply()
 function startAutoMakeData()
 {
 	makeDataExec();
+
+	let intervalId = setInterval(function (){
+		if(!isAutoOperate){
+			clearInterval(intervalId);
+		}
+		updateHandleNums();
+	},3000);
 }
 
 async function makeDataExec()
@@ -160,6 +183,10 @@ async function makeDataExec()
 	if(hasMakeDataNums >= dataNums)
 	{
 		showPromptMessagePopup("已经自动处理完" + dataNums + "条数据！");
+		return;
+	}
+	else if(!isAutoOperate)
+	{
 		return;
 	}
 	let activeVideo = document.querySelector("div[data-e2e=feed-active-video]");
@@ -171,7 +198,7 @@ async function makeDataExec()
 			console.log("包含关键词：" + userKeyword);
 		} else {
 			console.log("不包含关键词：" + userKeyword);
-			doNextVideoData();
+			await doNextVideoData();
 			return;
 		}
 		if(makeDataType == "2")
@@ -182,7 +209,7 @@ async function makeDataExec()
 			const randomInteger = Math.floor(Math.random() * (max - min + 1)) + min;
 			if(randomInteger <=50){
 				console.log("随机结果不处理");
-				doNextVideoData();
+				await doNextVideoData();
 				return;
 			}
 			else{
@@ -200,8 +227,12 @@ async function makeDataExec()
 			console.log(displayValue);
 			if(displayValue == "block")
 			{
-				let doRes = await doFollow(followObj);
-				console.log("doFollow:" + doRes);
+				if(actionMap['follow'])
+				{
+					let doRes = await doFollow(followObj);
+					console.log("doFollow:" + doRes);
+				}
+
 			}
 		}
 
@@ -212,8 +243,12 @@ async function makeDataExec()
 			let fwState = likeObj.getAttribute('data-e2e-state');
 			if(fwState == "video-player-no-digged")
 			{
-				let doRes = await doLike(likeObj);
-				console.log("doLike:" + doRes);
+				if(actionMap['like'])
+				{
+					let doRes = await doLike(likeObj);
+					console.log("doLike:" + doRes);
+				}
+
 			}
 
 			//收藏
@@ -223,33 +258,42 @@ async function makeDataExec()
 				let clState = collectObj.getAttribute('data-e2e-state');
 				if(clState == "video-player-no-collect")
 				{
-					let doRes = await doCollect(collectObj);
-					console.log("doCollect:" + doRes);
+					if(actionMap['favorite'])
+					{
+						let doRes = await doCollect(collectObj);
+						console.log("doCollect:" + doRes);
+					}
 				}
 			}
 
 			//评论
 			let commentObj = activeVideo.querySelector("div[data-e2e=feed-comment-icon]");
 			if(commentObj) {
-				let doRes = '';
-				doRes = await doComment(commentObj);
-				console.log("doComment:" + doRes);
-				doRes = await inputCommentContent();
-				console.log("inputCommentContent:" + doRes);
-				doRes = await submitCommentContent();
-				console.log("submitCommentContent:" + doRes);
-				doRes = await submitCommentContentComplete(commentObj);
-				console.log("submitCommentContentComplete:" + doRes);
+				if(actionMap['comment'])
+				{
+					let doRes = '';
+					doRes = await doComment(commentObj);
+					console.log("doComment:" + doRes);
+					doRes = await inputCommentContent();
+					console.log("inputCommentContent:" + doRes);
+					doRes = await submitCommentContent();
+					console.log("submitCommentContent:" + doRes);
+					doRes = await submitCommentContentComplete(commentObj);
+					console.log("submitCommentContentComplete:" + doRes);
+				}
 			}
+			//增加完成数据
+			hasMakeDataNums ++;
+			await doNextVideoData();
 		}
 		else
 		{
-			doNextVideoData();
+			await doNextVideoData();
 		}
 	}
 	else
 	{
-		doNextVideoData();
+		await doNextVideoData();
 	}
 }
 
@@ -328,8 +372,6 @@ function submitCommentContentComplete(target)
 	return new Promise(function(resolve, reject) {
 		setTimeout(function (){
 			target.click();
-			hasMakeDataNums ++;
-			doNextVideoData();
 			resolve("success");
 		},2000);
 	})
@@ -337,11 +379,16 @@ function submitCommentContentComplete(target)
 
 function doNextVideoData()
 {
-	let nextVideoBtn = document.querySelector("div[data-e2e=video-switch-next-arrow]");
-	nextVideoBtn.click();
-	setTimeout(function (){
-		makeDataExec();
-	},3000);
+	return new Promise(function(resolve, reject) {
+		setTimeout(function (){
+			let nextVideoBtn = document.querySelector("div[data-e2e=video-switch-next-arrow]");
+			nextVideoBtn.click();
+			setTimeout(function (){
+				makeDataExec();
+			},3000);
+			resolve("success");
+		},2000);
+	})
 }
 
 // 复制文本到剪贴板
@@ -432,7 +479,7 @@ function initSetting(callback)
 		dataNums = (data.hasOwnProperty("nmx_dylive_setting") && data.nmx_dylive_setting.hasOwnProperty("dataNums")) ? data.nmx_dylive_setting.dataNums : '';
 		dataNums = parseInt(dataNums, 10);
 		userKeyword = (data.hasOwnProperty("nmx_dylive_setting") && data.nmx_dylive_setting.hasOwnProperty("userKeyword")) ? data.nmx_dylive_setting.userKeyword : '';
-
+		actionMap = (data.hasOwnProperty("nmx_dylive_setting") && data.nmx_dylive_setting.hasOwnProperty("actionMap")) ? data.nmx_dylive_setting.actionMap : {};
 		// 在这里使用存储的值
 		console.log(autoReplyText);
 		if(callback) callback();
@@ -457,12 +504,12 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	console.log(message.type);
 	if(message.type == 'open_auto_reply')
 	{
-		isAutoReply = true;
+		isAutoOperate = true;
 		startAutoReply();
 	}
 	else if(message.type == 'close_auto_reply')
 	{
-		isAutoReply = false;
+		isAutoOperate = false;
 	}
 	else if(message.type == 'check_mkey_complete')
 	{

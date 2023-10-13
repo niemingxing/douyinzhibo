@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var dataNumsInput = document.getElementById('dataNums');
     var commentContentInput = document.getElementById('commentContent');
     var saveButton = document.getElementById('saveButton');
-
+    var checkBoxes = document.getElementsByName('action');
     // 获取保存的密钥值并设置输入框的默认值
     chrome.storage.local.get('nmx_dylive_setting', function(result) {
         let setting = result.nmx_dylive_setting;
@@ -18,6 +18,12 @@ document.addEventListener('DOMContentLoaded', function() {
             dataNumsInput.value = setting.dataNums;
             commentContentInput.value = setting.commentContent;
             userKeywordInput.value = setting.userKeyword;
+            for (const checkbox of checkBoxes) {
+                const value = checkbox.value;
+                if (setting.actionMap[value] !== undefined) {
+                    checkbox.checked = setting.actionMap[value];
+                }
+            }
             console.log(setting);
         }
     });
@@ -32,6 +38,14 @@ document.addEventListener('DOMContentLoaded', function() {
             'commentContent':commentContentInput.value,
             'userKeyword':userKeywordInput.value
         };
+
+        //获取操作map
+        const selectedOptions = {};
+        for (const checkbox of checkBoxes) {
+            selectedOptions[checkbox.value] = checkbox.checked;
+        }
+        setting.actionMap = selectedOptions;
+
         chrome.storage.local.set({ 'nmx_dylive_setting': setting }, function() {
             alert('设置已保存');
         });
