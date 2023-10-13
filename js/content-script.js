@@ -1,13 +1,18 @@
 ﻿let currentDomain = window.location.hostname;
 let autoReplyText = '';
+let autoCommentText = '';
 let isAutoReply = false;
+let makeDataType = '';
+let dataNums = 0;
+let userKeyword = '';
+let hasMakeDataNums = 0;
 /**
  * 初始化弹层
  */
 function initToolButton() {
 	const html = '<div class="gpt-sr-container">\n' +
 		'    <div class="gpt-sr-sidebar">\n' +
-		'      <button id="dylive-sr-toggleButton">开启自动回复</button>\n' +
+		'      <button id="dylive-sr-toggleButton">开启自动操作</button>\n' +
 		'    </div>\n' +
 		'  </div>\n' +
 		'  \n' +
@@ -24,22 +29,22 @@ function initToolButton() {
 	popupElement.innerHTML = html;
 	document.body.appendChild(popupElement);
 	document.querySelector("#dylive-sr-toggleButton").addEventListener("click", function() {
-		if(this.innerText.includes("开启自动回复"))
+		if(this.innerText.includes("开启自动操作"))
 		{
 			this.disabled = true;
 			isAutoReply = true;
 			this.style.backgroundColor = 'red';
-			this.innerText = this.innerText.replace("开启自动回复","关闭自动回复");
+			this.innerText = this.innerText.replace("开启自动操作","关闭自动操作");
 			chrome.runtime.sendMessage({"type":"check_mkey"}, function (response) {
 				console.log(response.farewell)
 			});
 		}
-		else if(this.innerText.includes("关闭自动回复"))
+		else if(this.innerText.includes("关闭自动操作"))
 		{
 			this.disabled = false;
 			isAutoReply = false;
 			this.style.backgroundColor = '#00bebd';
-			this.innerText = this.innerText.replace("关闭自动回复","开启自动回复");
+			this.innerText = this.innerText.replace("关闭自动操作","开启自动操作");
 		}
 	});
 }
@@ -107,6 +112,22 @@ function addStylesheet(url) {
 	document.head.appendChild(linkElement);
 }
 
+function startWork()
+{
+	let pageType = getPageType();
+	if(pageType == "douyin_live")
+	{
+		startAutoReply();
+	}
+	else if(pageType == "douyin_recommend")
+	{
+		startAutoMakeData();
+	}
+}
+
+/**
+ * 开始自动公屏回复
+ */
 function startAutoReply()
 {
 	let chatTextArea = document.querySelector("textarea.webcast-chatroom___textarea");
@@ -118,7 +139,7 @@ function startAutoReply()
 		if(!isAutoReply) clearInterval(intervalId);
 		const delay = getRandomDelay(minDelay, maxDelay);
 		setTimeout(() => {
-			inputDispatchEventEvent(chatTextArea,autoReplyText);
+			inputDispatchEventEvent(chatTextArea,getRandomContentFromText(autoReplyText));
 			setTimeout(function (){
 				sendButton.click();
 			},500);
@@ -126,11 +147,198 @@ function startAutoReply()
 	}, 5000); // 这里设置 setInterval 的时间间隔为最大等待时间
 }
 
+/**
+ * 开始自动做数据
+ */
+function startAutoMakeData()
+{
+	makeDataExec();
+}
+
+function makeDataExec()
+{
+	if(hasMakeDataNums >= dataNums)
+	{
+		showPromptMessagePopup("已经自动处理完" + dataNums + "条数据！");
+		return;
+	}
+	let activeVideo = document.querySelector("div[data-e2e=feed-active-video]");
+	if(activeVideo)
+	{
+		let nickNameObj = activeVideo.querySelector("div[data-e2e=feed-video-nickname]");
+		let nickName = nickNameObj.textContent;
+		if (makeDataType =="1" && nickName.includes(userKeyword)) {
+			console.log("包含关键词：" + userKeyword);
+		} else {
+			console.log("不包含关键词：" + userKeyword);
+			doNextVideoData();
+			return;
+		}
+		if(makeDataType == "2")
+		{
+			// 生成一个 1 到 100 之间的随机整数
+			const min = 1;
+			const max = 100;
+			const randomInteger = Math.floor(Math.random() * (max - min + 1)) + min;
+			if(randomInteger <=50){
+				console.log("随机结果不处理");
+				doNextVideoData();
+				return;
+			}
+			else{
+				console.log("随机结果可以处理");
+			}
+		}
+
+		//关注
+		let followObj = activeVideo.querySelector("div[data-e2e=feed-follow-icon]");
+		if(followObj)
+		{
+			let svgObj = followObj.querySelector("svg");
+			let computedStyle = window.getComputedStyle(svgObj);
+			let displayValue = computedStyle.getPropertyValue("display");
+			console.log(displayValue);
+			if(displayValue == "block")
+			{
+				setTimeout(function (){
+					followObj.firstElementChild.click();
+				},1000);
+			}
+		}
+
+		let likeObj = activeVideo.querySelector("div[data-e2e=video-player-digg]");
+		if(likeObj)
+		{
+			//点赞
+			let fwState = likeObj.getAttribute('data-e2e-state');
+			if(fwState == "video-player-no-digged")
+			{
+				setTimeout(function (){
+					likeObj.click();
+				},4000);
+			}
+
+			//收藏
+			let collectObj = activeVideo.querySelector("div[data-e2e=video-player-collect]");
+			if(collectObj)
+			{
+				let clState = collectObj.getAttribute('data-e2e-state');
+				if(clState == "video-player-no-collect")
+				{
+					setTimeout(function (){
+						collectObj.click();
+					},7000);
+				}
+			}
+
+			//评论
+			let commentObj = activeVideo.querySelector("div[data-e2e=feed-comment-icon]");
+			if(commentObj) {
+				setTimeout(function (){
+					commentObj.click();
+					setTimeout(function (){
+						let commentInput = document.querySelector("div.comment-input-inner-container div.DraftEditor-editorContainer").firstElementChild;
+						console.log(commentInput);
+						copyToClipboard(getRandomContentFromText(autoCommentText));
+						// 设置编辑器焦点
+						commentInput.focus();
+						document.execCommand("paste");
+						setTimeout(function (){
+							let optBtnObjs = document.querySelector("div.commentInput-right-ct").firstElementChild;
+							let commentSubmitObj = optBtnObjs.children[2];
+							if(commentSubmitObj)
+							{
+								commentSubmitObj.click();
+								setTimeout(function (){
+									commentObj.click();
+									hasMakeDataNums ++;
+									doNextVideoData();
+								},2000);
+							}
+						},2000);
+						console.log("点击留言框");
+					},3000);
+				},10000);
+			}
+		}
+		else
+		{
+			doNextVideoData();
+		}
+	}
+	else
+	{
+		doNextVideoData();
+	}
+}
+
+function doFollow(target) {
+	return new Promise(function(resolve, reject) {
+		setTimeout(function (){
+			target.firstElementChild.click();
+		},1000);
+	})
+}
+
+function testAsync2() {
+	return new Promise(function(resolve, reject) {
+		setTimeout(function() {
+			if (true) {
+				console.log('请求中2...')
+				resolve('resolve return2')
+			} else {
+				reject('reject return2')
+			}
+		}, 2000)
+	})
+}
+
+function doNextVideoData()
+{
+	let nextVideoBtn = document.querySelector("div[data-e2e=video-switch-next-arrow]");
+	nextVideoBtn.click();
+	setTimeout(function (){
+		makeDataExec();
+	},3000);
+}
+
+// 复制文本到剪贴板
+function copyToClipboard(text) {
+	const textArea = document.createElement("textarea");
+	textArea.value = text;
+	document.body.appendChild(textArea);
+	textArea.select();
+	document.execCommand("copy");
+	document.body.removeChild(textArea);
+}
+
+
+
+
 function getRandomDelay(min, max) {
 	// 生成一个[min, max]之间的随机数，单位是毫秒
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+/**
+ * 获取页面类型
+ * @returns {string}
+ */
+function getPageType()
+{
+	currentUrl = window.location.href;
+	let pageType = '';
+	if(currentUrl.includes("https://www.douyin.com/"))
+	{
+		pageType = "douyin_recommend";
+	}
+	else if(currentUrl.includes("https://live.douyin.com/"))
+	{
+		pageType = "douyin_live";
+	}
+	console.log(pageType);
+	return pageType;
+}
 
 /**
  * input对象输入、改变、键盘事件分发
@@ -161,11 +369,28 @@ function inputDispatchEventEvent(obj,value)
 	obj.dispatchEvent(keyUpEvent);
 }
 
+function getRandomContentFromText(inputText) {
+	// 首先将输入字符串按换行符拆分成一个数组
+	const lines = inputText.split('\n');
+
+	// 随机生成一个索引，范围在0到数组长度之间
+	const randomIndex = Math.floor(Math.random() * lines.length);
+
+	// 返回随机选取的一行
+	return lines[randomIndex];
+}
+
 function initSetting(callback)
 {
 	// 获取存储的值
 	chrome.storage.local.get('nmx_dylive_setting', function (data) {
 		autoReplyText = (data.hasOwnProperty("nmx_dylive_setting") && data.nmx_dylive_setting.hasOwnProperty("autoReply")) ? data.nmx_dylive_setting.autoReply : '';
+		autoCommentText = (data.hasOwnProperty("nmx_dylive_setting") && data.nmx_dylive_setting.hasOwnProperty("commentContent")) ? data.nmx_dylive_setting.commentContent : '';
+		makeDataType = (data.hasOwnProperty("nmx_dylive_setting") && data.nmx_dylive_setting.hasOwnProperty("makeDataType")) ? data.nmx_dylive_setting.makeDataType : '';
+		dataNums = (data.hasOwnProperty("nmx_dylive_setting") && data.nmx_dylive_setting.hasOwnProperty("dataNums")) ? data.nmx_dylive_setting.dataNums : '';
+		dataNums = parseInt(dataNums, 10);
+		userKeyword = (data.hasOwnProperty("nmx_dylive_setting") && data.nmx_dylive_setting.hasOwnProperty("userKeyword")) ? data.nmx_dylive_setting.userKeyword : '';
+
 		// 在这里使用存储的值
 		console.log(autoReplyText);
 		if(callback) callback();
@@ -173,7 +398,7 @@ function initSetting(callback)
 }
 // 在页面加载完成后插入弹层和引入CSS文件
 window.onload = function() {
-	if(currentDomain.includes("live.douyin.com"))
+	if(currentDomain.includes("live.douyin.com") || currentDomain.includes("www.douyin.com"))
 	{
 		initSetting(function (){
 			initPromptMessagePopup();
@@ -206,7 +431,7 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		}
 		else
 		{
-			startAutoReply();
+			startWork();
 		}
 	}
 });

@@ -19,7 +19,35 @@
         <div class="input-container">
             <label for="autoReply" class="label">公屏回复:</label>
             <div class="input-wrapper">
-                <input type="text" id="autoReply" class="input-field" placeholder="请输入自动回复内容">
+                <textarea id="autoReply" class="input-field" rows="8" placeholder="请输入自动回复内容"></textarea>
+            </div>
+        </div>
+        <div class="input-container">
+            <label for="makeDataType" class="label">做数据类型:</label>
+            <div class="input-wrapper">
+                <select id="makeDataType" class="input-field">
+                    <option value="1">关键词</option>
+                    <option value="2">随机</option>
+                    <option value="3">顺序</option>
+                </select>
+            </div>
+        </div>
+        <div class="input-container">
+            <label for="userKeyword" class="label">关键词:</label>
+            <div class="input-wrapper">
+                <input type="text" id="userKeyword" class="input-field" placeholder="请输入用户关键词">
+            </div>
+        </div>
+        <div class="input-container">
+            <label for="dataNums" class="label">条数:</label>
+            <div class="input-wrapper">
+                <input type="text" id="dataNums" class="input-field" placeholder="请输入条数">
+            </div>
+        </div>
+        <div class="input-container">
+            <label for="commentContent" class="label">评论内容:</label>
+            <div class="input-wrapper">
+                <textarea id="commentContent" class="input-field" rows="8" placeholder="请输入评论内容"></textarea>
             </div>
         </div>
         <button id="saveButton" class="save-button">保存设置</button>
