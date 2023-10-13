@@ -192,16 +192,20 @@ async function makeDataExec()
 	let activeVideo = document.querySelector("div[data-e2e=feed-active-video]");
 	if(activeVideo)
 	{
-		let nickNameObj = activeVideo.querySelector("div[data-e2e=feed-video-nickname]");
-		let nickName = nickNameObj.textContent;
-		if (makeDataType =="1" && nickName.includes(userKeyword)) {
-			console.log("包含关键词：" + userKeyword);
-		} else {
-			console.log("不包含关键词：" + userKeyword);
-			await doNextVideoData();
-			return;
+		if (makeDataType =="1")
+		{
+			let nickNameObj = activeVideo.querySelector("div[data-e2e=feed-video-nickname]");
+			let nickName = nickNameObj.textContent;
+			if(nickName.includes(userKeyword))
+			{
+				console.log("包含关键词：" + userKeyword);
+			} else {
+				console.log("不包含关键词：" + userKeyword);
+				await doNextVideoData();
+				return;
+			}
 		}
-		if(makeDataType == "2")
+		else if(makeDataType == "2")
 		{
 			// 生成一个 1 到 100 之间的随机整数
 			const min = 1;
