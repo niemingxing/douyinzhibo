@@ -7,6 +7,8 @@ let dataNums = 0;
 let userKeyword = '';
 let hasMakeDataNums = 0;
 let actionMap = {};
+let minDelay = 2000;
+let maxDelay = 3000;
 /**
  * 初始化弹层
  */
@@ -148,8 +150,6 @@ function startAutoReply()
 {
 	let chatTextArea = document.querySelector("textarea.webcast-chatroom___textarea");
 	let sendButton = document.querySelector("button.webcast-chatroom___send-btn");
-	const minDelay = 1000; // 最小等待时间，单位毫秒
-	const maxDelay = 3000; // 最大等待时间，单位毫秒
 
 	let intervalId = setInterval(() => {
 		if(!isAutoOperate) clearInterval(intervalId);
@@ -302,7 +302,7 @@ function doFollow(target) {
 		setTimeout(function (){
 			target.firstElementChild.click();
 			resolve("success");
-		},1000);
+		},getRandomDelay(minDelay, maxDelay));
 	})
 }
 
@@ -312,7 +312,7 @@ function doLike(target)
 		setTimeout(function (){
 			target.click();
 			resolve("success");
-		},2000);
+		},getRandomDelay(minDelay, maxDelay));
 	})
 }
 
@@ -322,7 +322,7 @@ function doCollect(target)
 		setTimeout(function (){
 			target.click();
 			resolve("success");
-		},2000);
+		},getRandomDelay(minDelay, maxDelay));
 	})
 }
 
@@ -332,7 +332,7 @@ function doComment(target)
 		setTimeout(function (){
 			target.click();
 			resolve("success");
-		},2000);
+		},getRandomDelay(minDelay, maxDelay));
 	})
 }
 
@@ -348,7 +348,7 @@ function inputCommentContent()
 			document.execCommand("paste");
 			console.log("点击留言框");
 			resolve("success");
-		},3000);
+		},getRandomDelay(minDelay, maxDelay));
 	})
 }
 
@@ -363,7 +363,7 @@ function submitCommentContent()
 				commentSubmitObj.click();
 			}
 			resolve("success");
-		},2000);
+		},getRandomDelay(minDelay, maxDelay));
 	})
 }
 
@@ -373,7 +373,7 @@ function submitCommentContentComplete(target)
 		setTimeout(function (){
 			target.click();
 			resolve("success");
-		},2000);
+		},getRandomDelay(minDelay, maxDelay));
 	})
 }
 
@@ -385,9 +385,9 @@ function doNextVideoData()
 			nextVideoBtn.click();
 			setTimeout(function (){
 				makeDataExec();
-			},3000);
+			},getRandomDelay(minDelay, maxDelay));
 			resolve("success");
-		},2000);
+		},getRandomDelay(minDelay, maxDelay));
 	})
 }
 
