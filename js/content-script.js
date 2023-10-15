@@ -221,54 +221,9 @@ async function makeDataExec()
 			}
 		}
 
-		//关注
-		let followObj = activeVideo.querySelector("div[data-e2e=feed-follow-icon]");
-		if(followObj)
-		{
-			let svgObj = followObj.querySelector("svg");
-			let computedStyle = window.getComputedStyle(svgObj);
-			let displayValue = computedStyle.getPropertyValue("display");
-			console.log(displayValue);
-			if(displayValue == "block")
-			{
-				if(actionMap['follow'])
-				{
-					let doRes = await doFollow(followObj);
-					console.log("doFollow:" + doRes);
-				}
-
-			}
-		}
-
 		let likeObj = activeVideo.querySelector("div[data-e2e=video-player-digg]");
 		if(likeObj)
 		{
-			//点赞
-			let fwState = likeObj.getAttribute('data-e2e-state');
-			if(fwState == "video-player-no-digged")
-			{
-				if(actionMap['like'])
-				{
-					let doRes = await doLike(likeObj);
-					console.log("doLike:" + doRes);
-				}
-
-			}
-
-			//收藏
-			let collectObj = activeVideo.querySelector("div[data-e2e=video-player-collect]");
-			if(collectObj)
-			{
-				let clState = collectObj.getAttribute('data-e2e-state');
-				if(clState == "video-player-no-collect")
-				{
-					if(actionMap['favorite'])
-					{
-						let doRes = await doCollect(collectObj);
-						console.log("doCollect:" + doRes);
-					}
-				}
-			}
 
 			//评论
 			let commentObj = activeVideo.querySelector("div[data-e2e=feed-comment-icon]");
@@ -286,6 +241,53 @@ async function makeDataExec()
 					console.log("submitCommentContentComplete:" + doRes);
 				}
 			}
+
+			//收藏
+			let collectObj = activeVideo.querySelector("div[data-e2e=video-player-collect]");
+			if(collectObj)
+			{
+				let clState = collectObj.getAttribute('data-e2e-state');
+				if(clState == "video-player-no-collect")
+				{
+					if(actionMap['favorite'])
+					{
+						let doRes = await doCollect(collectObj);
+						console.log("doCollect:" + doRes);
+					}
+				}
+			}
+
+			//点赞
+			let fwState = likeObj.getAttribute('data-e2e-state');
+			if(fwState == "video-player-no-digged")
+			{
+				if(actionMap['like'])
+				{
+					let doRes = await doLike(likeObj);
+					console.log("doLike:" + doRes);
+				}
+
+			}
+
+			//关注
+			let followObj = activeVideo.querySelector("div[data-e2e=feed-follow-icon]");
+			if(followObj)
+			{
+				let svgObj = followObj.querySelector("svg");
+				let computedStyle = window.getComputedStyle(svgObj);
+				let displayValue = computedStyle.getPropertyValue("display");
+				console.log(displayValue);
+				if(displayValue == "block")
+				{
+					if(actionMap['follow'])
+					{
+						let doRes = await doFollow(followObj);
+						console.log("doFollow:" + doRes);
+					}
+
+				}
+			}
+
 			//增加完成数据
 			hasMakeDataNums ++;
 			await doNextVideoData();
