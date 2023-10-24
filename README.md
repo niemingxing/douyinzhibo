@@ -8,6 +8,8 @@
 
 ![image](https://github.com/niemingxing/douyinzhibo/assets/7400829/4b0b5553-d945-41ba-90a6-315460b770cc)
 
+![image](https://github.com/niemingxing/douyinzhibo/assets/7400829/4175ae1f-1643-4a94-8eaa-1ea498287a62)
+
 ### 交流方式：
 
 ![vx:histargo](https://i.ibb.co/hMbTs1G/a3779b33-bfe2-4ff9-a592-f0ec090a3055-1-2.jpg)
