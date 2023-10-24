@@ -1,8 +1,8 @@
 {
 	"manifest_version": 3,
-	"name": "抖音直播公屏消息助手",
+	"name": "抖音自动化操作助手",
 	"version": "1.0",
-	"description": "抖音直播公屏自动发送消息，解放双手。",
+	"description": "抖音自动化操作助手，完美提效，解放双手。",
 	"author": "niemingxing",
 	"icons":
 	{
