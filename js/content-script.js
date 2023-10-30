@@ -149,15 +149,22 @@ function startWork()
 function startAutoReply()
 {
 	let chatTextArea = document.querySelector("textarea.webcast-chatroom___textarea");
-	let sendButton = document.querySelector("button.webcast-chatroom___send-btn");
-
 	let intervalId = setInterval(() => {
 		if(!isAutoOperate) clearInterval(intervalId);
 		const delay = getRandomDelay(minDelay, maxDelay);
 		setTimeout(() => {
 			inputDispatchEventEvent(chatTextArea,getRandomContentFromText(autoReplyText));
 			setTimeout(function (){
-				sendButton.click();
+				let sendButton = document.querySelector("svg.webcast-chatroom___send-btn");
+				console.log(sendButton.firstElementChild);
+				// 创建并分发一个 click 事件
+				let clickEvent = new MouseEvent("click", {
+					bubbles: true,
+					cancelable: true,
+					view: window
+				});
+				sendButton.firstElementChild.dispatchEvent(clickEvent);
+
 			},500);
 		}, delay);
 	}, 5000); // 这里设置 setInterval 的时间间隔为最大等待时间
