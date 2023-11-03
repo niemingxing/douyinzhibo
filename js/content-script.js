@@ -162,17 +162,17 @@ function startAutoReply()
 				}
 				else
 				{
-					sendButton = document.querySelector("svg.webcast-chatroom___send-btn");
-					if(sendButton)
+					let newSendButton = document.querySelector("svg.webcast-chatroom___send-btn");
+					if(newSendButton)
 					{
-						console.log(sendButton.firstElementChild);
+						console.log(newSendButton.firstElementChild);
 						// 创建并分发一个 click 事件
 						let clickEvent = new MouseEvent("click", {
 							bubbles: true,
 							cancelable: true,
 							view: window
 						});
-						sendButton.firstElementChild.dispatchEvent(clickEvent);
+						newSendButton.firstElementChild.dispatchEvent(clickEvent);
 					}
 				}
 			},500);
