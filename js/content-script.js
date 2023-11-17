@@ -213,6 +213,7 @@ async function makeDataExec()
 		{
 			let nickNameObj = activeVideo.querySelector("div[data-e2e=feed-video-nickname]");
 			let nickName = nickNameObj.textContent;
+			console.log(nickName);
 			if(nickName.includes(userKeyword))
 			{
 				console.log("包含关键词：" + userKeyword);
@@ -404,8 +405,17 @@ function doNextVideoData()
 {
 	return new Promise(function(resolve, reject) {
 		setTimeout(function (){
-			let nextVideoBtn = document.querySelector("div[data-e2e=video-switch-next-arrow]");
-			nextVideoBtn.click();
+			let activeVideo = document.querySelector("div[data-e2e=feed-active-video]");
+			if(activeVideo)
+			{
+				let nextVideoBtn = activeVideo.querySelector("div[data-e2e=video-switch-next-arrow]");
+				if(!nextVideoBtn)
+				{
+					nextVideoBtn = document.querySelector("div[data-e2e=video-switch-next-arrow]");
+				}
+				console.log(nextVideoBtn);
+				nextVideoBtn.click();
+			}
 			setTimeout(function (){
 				makeDataExec();
 			},getRandomDelay(minDelay, maxDelay));
