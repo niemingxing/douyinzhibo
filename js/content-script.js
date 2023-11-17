@@ -406,16 +406,17 @@ function doNextVideoData()
 	return new Promise(function(resolve, reject) {
 		setTimeout(function (){
 			let activeVideo = document.querySelector("div[data-e2e=feed-active-video]");
+			let nextVideoBtn;
 			if(activeVideo)
 			{
-				let nextVideoBtn = activeVideo.querySelector("div[data-e2e=video-switch-next-arrow]");
-				if(!nextVideoBtn)
-				{
-					nextVideoBtn = document.querySelector("div[data-e2e=video-switch-next-arrow]");
-				}
-				console.log(nextVideoBtn);
-				nextVideoBtn.click();
+				nextVideoBtn = activeVideo.querySelector("div[data-e2e=video-switch-next-arrow]");
 			}
+			if(!nextVideoBtn)
+			{
+				nextVideoBtn = document.querySelector("div[data-e2e=video-switch-next-arrow]");
+			}
+			console.log(nextVideoBtn);
+			nextVideoBtn.click();
 			setTimeout(function (){
 				makeDataExec();
 			},getRandomDelay(minDelay, maxDelay));
