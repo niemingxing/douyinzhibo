@@ -364,13 +364,18 @@ function inputCommentContent()
 {
 	return new Promise(function(resolve, reject) {
 		setTimeout(function (){
-			let commentInput = document.querySelector("div.comment-input-inner-container div.DraftEditor-editorContainer").firstElementChild;
-			console.log(commentInput);
-			copyToClipboard(getRandomContentFromText(autoCommentText));
-			// 设置编辑器焦点
-			commentInput.focus();
-			document.execCommand("paste");
-			console.log("点击留言框");
+
+			let commentArea = document.querySelector("div.comment-input-inner-container span");
+			if(commentArea) commentArea.click();
+			setTimeout(function (){
+				let commentInput = document.querySelector("div.comment-input-inner-container div.DraftEditor-editorContainer").firstElementChild;
+				console.log(commentInput);
+				copyToClipboard(getRandomContentFromText(autoCommentText));
+				// 设置编辑器焦点
+				commentInput.focus();
+				document.execCommand("paste");
+				console.log("点击留言框");
+			},300);
 			resolve("success");
 		},getRandomDelay(minDelay, maxDelay));
 	})
