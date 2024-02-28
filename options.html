@@ -17,6 +17,21 @@
             </div>
         </div>
         <div class="input-container">
+            <label for="replyIntervalTime" class="label">回复间隔时间:</label>
+            <div class="input-wrapper">
+                <input type="text" id="replyIntervalTime" class="input-field" placeholder="回复的间隔时间">
+            </div>
+        </div>
+        <div class="input-container">
+            <label class="label">拼接随机数:</label>
+            <div class="input-wrapper">
+                <input type="checkbox" id="addPrefixRandom" value="1">
+                <label for="addPrefixRandom">前缀</label>
+                <input type="checkbox" id="addSuffixRandom" value="1">
+                <label for="addSuffixRandom">后缀</label>
+            </div>
+        </div>
+        <div class="input-container">
             <label for="autoReply" class="label">公屏回复:</label>
             <div class="input-wrapper">
                 <textarea id="autoReply" class="input-field" rows="8" placeholder="请输入自动回复内容"></textarea>

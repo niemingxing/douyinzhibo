@@ -1,6 +1,9 @@
 ﻿let currentDomain = window.location.hostname;
 let autoReplyText = '';
 let autoCommentText = '';
+let addPrefixRandom = false;
+let addSuffixRandom = false;
+let replyIntervalTime = 5;
 let isAutoOperate = false;
 let makeDataType = '';
 let dataNums = 0;
@@ -154,7 +157,9 @@ function startAutoReply()
 		if(!isAutoOperate) clearInterval(intervalId);
 		const delay = getRandomDelay(minDelay, maxDelay);
 		setTimeout(() => {
-			inputDispatchEventEvent(chatTextArea,getRandomContentFromText(autoReplyText));
+			console.log(replyIntervalTime * 1000);
+			console.log(appendRandomDigits(getRandomContentFromText(autoReplyText)));
+			inputDispatchEventEvent(chatTextArea,appendRandomDigits(getRandomContentFromText(autoReplyText)));
 			setTimeout(function (){
 				if(sendButton)
 				{
@@ -177,7 +182,7 @@ function startAutoReply()
 				}
 			},500);
 		}, delay);
-	}, 5000); // 这里设置 setInterval 的时间间隔为最大等待时间
+	}, replyIntervalTime * 1000); // 这里设置 setInterval 的时间间隔为最大等待时间
 }
 
 /**
@@ -441,7 +446,23 @@ function copyToClipboard(text) {
 }
 
 
+// 生成随机三位数
+function generateRandomNumber() {
+	return Math.floor(Math.random() * 900) + 100; // 生成100到999之间的随机数
+}
 
+// 给字符串前后拼接随机三位数
+function appendRandomDigits(str) {
+	const randomNumber1 = generateRandomNumber();
+	const randomNumber2 = generateRandomNumber();
+	if(addPrefixRandom){
+		str = randomNumber1 + str
+	}
+	if(addSuffixRandom){
+		str = str + randomNumber2;
+	}
+	return str;
+}
 
 function getRandomDelay(min, max) {
 	// 生成一个[min, max]之间的随机数，单位是毫秒
@@ -519,6 +540,9 @@ function initSetting(callback)
 		dataNums = parseInt(dataNums, 10);
 		userKeyword = (data.hasOwnProperty("nmx_dylive_setting") && data.nmx_dylive_setting.hasOwnProperty("userKeyword")) ? data.nmx_dylive_setting.userKeyword : '';
 		actionMap = (data.hasOwnProperty("nmx_dylive_setting") && data.nmx_dylive_setting.hasOwnProperty("actionMap")) ? data.nmx_dylive_setting.actionMap : {};
+		addPrefixRandom = (data.hasOwnProperty("nmx_dylive_setting") && data.nmx_dylive_setting.hasOwnProperty("addPrefixRandom")) ? data.nmx_dylive_setting.addPrefixRandom : 0;
+		addSuffixRandom = (data.hasOwnProperty("nmx_dylive_setting") && data.nmx_dylive_setting.hasOwnProperty("addSuffixRandom")) ? data.nmx_dylive_setting.addSuffixRandom : 0;
+		replyIntervalTime = (data.hasOwnProperty("nmx_dylive_setting") && data.nmx_dylive_setting.hasOwnProperty("replyIntervalTime")) ? data.nmx_dylive_setting.replyIntervalTime : replyIntervalTime;
 		// 在这里使用存储的值
 		console.log(autoReplyText);
 		if(callback) callback();
