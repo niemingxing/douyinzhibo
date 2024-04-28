@@ -391,7 +391,8 @@ function submitCommentContent()
 	return new Promise(function(resolve, reject) {
 		setTimeout(function (){
 			let optBtnObjs = document.querySelector("div.commentInput-right-ct").firstElementChild;
-			let commentSubmitObj = optBtnObjs.children[2];
+			let commentSubmitObj = optBtnObjs.children[4];
+			console.log(commentSubmitObj);
 			if(commentSubmitObj)
 			{
 				commentSubmitObj.click();
