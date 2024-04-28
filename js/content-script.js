@@ -53,6 +53,16 @@ function initToolButton() {
 			this.innerText = this.innerText.replace("关闭自动操作","开启自动操作");
 		}
 	});
+
+	// 监听键盘事件
+	document.addEventListener('keydown', function(event) {
+		if (event.key === 'e' && event.ctrlKey) {
+			// 阻止浏览器默认行为，避免触发其他操作
+			event.preventDefault();
+			// 触发按钮点击
+			document.querySelector("#dylive-sr-toggleButton").click();
+		}
+	});
 }
 
 function activiteToolButton()
@@ -151,36 +161,39 @@ function startWork()
  */
 function startAutoReply()
 {
-	let chatTextArea = document.querySelector("textarea.webcast-chatroom___textarea");
-	let sendButton = document.querySelector("button.webcast-chatroom___send-btn");
 	let intervalId = setInterval(() => {
+		let chatTextArea = document.querySelector("textarea.webcast-chatroom___textarea");
+		let sendButton = document.querySelector("button.webcast-chatroom___send-btn");
 		if(!isAutoOperate) clearInterval(intervalId);
 		const delay = getRandomDelay(minDelay, maxDelay);
 		setTimeout(() => {
 			console.log(replyIntervalTime * 1000);
 			console.log(appendRandomDigits(getRandomContentFromText(autoReplyText)));
-			inputDispatchEventEvent(chatTextArea,appendRandomDigits(getRandomContentFromText(autoReplyText)));
-			setTimeout(function (){
-				if(sendButton)
-				{
-					sendButton.click();
-				}
-				else
-				{
-					let newSendButton = document.querySelector("svg.webcast-chatroom___send-btn");
-					if(newSendButton)
+			if(chatTextArea)
+			{
+				inputDispatchEventEvent(chatTextArea,appendRandomDigits(getRandomContentFromText(autoReplyText)));
+				setTimeout(function (){
+					if(sendButton)
 					{
-						console.log(newSendButton.firstElementChild);
-						// 创建并分发一个 click 事件
-						let clickEvent = new MouseEvent("click", {
-							bubbles: true,
-							cancelable: true,
-							view: window
-						});
-						newSendButton.firstElementChild.dispatchEvent(clickEvent);
+						sendButton.click();
 					}
-				}
-			},500);
+					else
+					{
+						let newSendButton = document.querySelector("svg.webcast-chatroom___send-btn");
+						if(newSendButton)
+						{
+							console.log(newSendButton.firstElementChild);
+							// 创建并分发一个 click 事件
+							let clickEvent = new MouseEvent("click", {
+								bubbles: true,
+								cancelable: true,
+								view: window
+							});
+							newSendButton.firstElementChild.dispatchEvent(clickEvent);
+						}
+					}
+				},500);
+			}
 		}, delay);
 	}, replyIntervalTime * 1000); // 这里设置 setInterval 的时间间隔为最大等待时间
 }
