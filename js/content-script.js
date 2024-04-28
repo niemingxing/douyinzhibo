@@ -404,7 +404,7 @@ function submitCommentContent()
 	return new Promise(function(resolve, reject) {
 		setTimeout(function (){
 			let optBtnObjs = document.querySelector("div.commentInput-right-ct").firstElementChild;
-			let commentSubmitObj = optBtnObjs.children[4];
+			let commentSubmitObj = optBtnObjs.lastElementChild;
 			console.log(commentSubmitObj);
 			if(commentSubmitObj)
 			{
