@@ -162,7 +162,7 @@ function startWork()
 function startAutoReply()
 {
 	let intervalId = setInterval(() => {
-		let chatTextArea = document.querySelector("textarea.webcast-chatroom___textarea");
+		let chatTextArea = document.querySelector("div.editor-kit-container");
 		let sendButton = document.querySelector("button.webcast-chatroom___send-btn");
 		if(!isAutoOperate) clearInterval(intervalId);
 		const delay = getRandomDelay(minDelay, maxDelay);
@@ -171,7 +171,10 @@ function startAutoReply()
 			console.log(appendRandomDigits(getRandomContentFromText(autoReplyText)));
 			if(chatTextArea)
 			{
-				inputDispatchEventEvent(chatTextArea,appendRandomDigits(getRandomContentFromText(autoReplyText)));
+				chatTextArea.focus();
+				document.execCommand('insertText', false, appendRandomDigits(getRandomContentFromText(autoReplyText)));
+
+				//inputDispatchEventEvent(chatTextArea,appendRandomDigits(getRandomContentFromText(autoReplyText)));
 				setTimeout(function (){
 					if(sendButton)
 					{
